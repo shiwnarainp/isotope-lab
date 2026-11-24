@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Isotope Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a mass-spectrometer bench. Module rail on top; each station pairs a live model or data view (left) with the worksheet (right), stacking on narrow screens. Deliberately single dark theme. */
+:root{
+  color-scheme:dark;
+  --bg:#0c1220; --bg2:#101a2c; --panel:#141f35; --panel2:#1a2742; --ink:#ebf0f8; --muted:#9ba8be; --line:#2a3a58;
+  --accent:#b9a3ff; --accent-ink:#130b2e; --glow:rgba(185,163,255,.25);
+  --isoA:#b9a3ff; --isoB:#ffc35c;
+  --pro:#ff5a5f; --neu:#4f8dff; --ele:#c9d1dd;
+  --ok:#4fd18b; --ok-soft:#12321f; --no:#ff7b7b; --no-soft:#3b1b20; --warn-soft:#3a2e12;
+  --display:"Red Hat Display",ui-sans-serif,system-ui,sans-serif;
+  --body:"Red Hat Text",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Red Hat Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:12px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:radial-gradient(900px 500px at 80% -10%,#20214a 0%,transparent 60%),var(--bg);background-color:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.wrap{max-width:1160px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.12;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,4.4vw,3rem);font-weight:900;letter-spacing:-.02em}
+h2{font-size:1.55rem;font-weight:900}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)} .small{font-size:.88rem}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer;line-height:1.2}
+.btn:hover{box-shadow:0 0 0 4px var(--glow)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--accent)}
+.btn.ghost[aria-pressed="true"]{border-color:var(--accent);background:var(--glow)}
+.btn.sm{padding:5px 10px;font-size:.86rem}
+.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stack{display:grid;gap:14px}
+select,input[type=text],input:not([type]){background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+input[type=text],input:not([type]){font-family:var(--mono);font-size:1rem;width:100%}
+input.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+input.no{border-color:var(--no);background:var(--no-soft)}
+input:disabled{opacity:1}
+input[type=range]{accent-color:var(--accent);width:100%}
+textarea{width:100%;min-height:150px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;font-family:var(--mono);font-size:.84rem;color:var(--ink)}
+.top{padding-block:24px 4px}
+.top .wrap{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.top .sub{color:var(--muted);max-width:60ch}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.goals{margin-top:16px;border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:10px 16px}
+.goals summary{cursor:pointer;font-weight:700}
+.goals .g{display:grid;gap:10px;margin-top:10px;max-width:80ch}
+.goals ol{margin:4px 0 0;padding-left:22px}
+.rail{display:flex;gap:6px;overflow-x:auto;margin-top:16px;padding-bottom:4px}
+.rail button{flex:none;display:grid;gap:1px;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 12px;cursor:pointer;min-width:118px}
+.rail .n{font-family:var(--mono);font-size:.7rem;color:var(--muted)} .rail .t{font-weight:700;font-size:.92rem}
+.rail button[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.rail button.done .n{color:var(--ok)}
+.progress{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.progress .bar{flex:1 1 220px;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--ok))}
+.progress .lbl{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+main section{display:grid;gap:18px;margin-top:22px}
+.shead{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-start}
+.shead .t{display:grid;gap:6px;max-width:74ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px;align-content:start;min-width:0}
+.card.alt{background:var(--panel2)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:880px){.grid2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.grid3{grid-template-columns:minmax(0,1fr)}}
+.note{border-left:4px solid var(--accent);background:var(--bg2);padding:10px 14px;border-radius:0 8px 8px 0}
+.note.mis{border-left-color:var(--no)} .note.ok{border-left-color:var(--ok)}
+.keyidea{border:1px dashed var(--accent);border-radius:8px;padding:8px 12px;font-size:.94rem}
+.fb{min-height:1.4em;font-weight:700}
+.fb.ok{color:var(--ok)} .fb.no{color:var(--no)}
+.hint{background:var(--warn-soft);padding:8px 12px;border-radius:8px}
+.badge{display:inline-block;font-family:var(--mono);font-size:.74rem;padding:2px 8px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+.badge.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent} .badge.no{background:var(--no-soft);color:var(--no);border-color:transparent}
+.starter{font-size:.88rem;color:var(--muted);font-style:italic}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:center}
+thead th{background:var(--panel2)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.86rem}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+.dot.p{background:var(--pro)} .dot.n{background:var(--neu)} .dot.e{background:var(--ele)}
+.caption{font-size:.83rem;color:var(--muted)}
+.stage{background:radial-gradient(circle at 50% 46%,#1f2c55,var(--bg2) 72%);border:1px solid var(--line);border-radius:var(--r);display:grid;place-items:center;padding:6px}
+svg.atom{width:100%;max-width:360px;height:auto;display:block}
+svg.atom .shell{fill:none;stroke:rgba(201,209,221,.32);stroke-width:1.4;stroke-dasharray:4 5}
+svg.atom text{font-family:var(--mono),monospace;font-weight:700;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.isocard{cursor:pointer;text-align:center;border:1px solid var(--line);background:var(--panel2);border-radius:var(--r);padding:10px;display:grid;gap:6px;color:var(--ink)}
+.isocard[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.iso{display:inline-flex;align-items:center;font-family:var(--mono);line-height:1}
+.iso-n{display:inline-flex;flex-direction:column;align-items:flex-end;font-size:.5em;line-height:1.08;margin-right:.06em;font-weight:700}
+.iso-s{font-weight:900;font-family:var(--display)}
+.iso.lg{font-size:2.4rem} .iso.xl{font-size:4rem}
+.readout{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+.ro{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:grid;gap:2px}
+.ro span{font-size:.76rem;color:var(--muted)} .ro b{font-family:var(--mono);font-size:1.15rem}
+.ctrl{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+.ctrl .nm{font-weight:700} .ctrl output{font-family:var(--mono);font-size:1.25rem;min-width:2.2ch;text-align:center;font-weight:700}
+.ctrl button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);font-size:1.25rem;font-weight:700;cursor:pointer}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.fld{display:grid;gap:4px;font-size:.84rem;color:var(--muted);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:5px 10px;cursor:pointer;font-weight:700;font-size:.88rem}
+.chips button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.chips button.done{border-color:var(--ok);color:var(--ok)}
+fieldset.mc{border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;display:grid;gap:6px;margin:0;min-width:0}
+fieldset.mc legend{font-weight:700;padding:0 6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-radius:8px;cursor:pointer}
+.opt:hover{background:var(--panel2)}
+.opt input{margin-top:5px;accent-color:var(--accent);flex:none}
+.pop{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;max-width:420px}
+.pop span{aspect-ratio:1;display:grid;place-items:center;font:700 .62rem var(--mono),monospace}
+.pop .A{border:2px solid var(--isoA);border-radius:50%;color:var(--isoA)}
+.pop .B{border:2px solid var(--isoB);border-radius:3px;color:var(--isoB)}
+.big{font-family:var(--mono);font-size:1.6rem;font-weight:700}
+.scale{position:relative;height:70px;margin:8px 10px}
+.scale .ln{position:absolute;left:0;right:0;top:26px;height:2px;background:var(--line)}
+.scale .tk{position:absolute;top:18px;width:2px;height:18px;background:var(--muted)}
+.scale .tl{position:absolute;top:38px;transform:translateX(-50%);font:600 .76rem var(--mono),monospace;color:var(--muted);white-space:nowrap}
+.scale .mk{position:absolute;top:8px;transform:translateX(-50%);display:grid;justify-items:center;font:700 .76rem var(--mono),monospace;transition:left .25s}
+.scale .mk i{width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--glow)}
+.scale .mk.simple{top:56px;color:var(--muted)} .scale .mk.simple i{background:transparent;border:2px dashed var(--muted);box-shadow:none;width:10px;height:10px}
+.steps{display:grid;gap:12px}
+.stepc{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:8px;background:var(--bg2)}
+.stepc.lock{opacity:.45}
+.stepc .rowf{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stepc .rowf input{max-width:120px}
+.eq{font-family:var(--mono);font-size:1.05rem}
+.calc td input{max-width:120px;margin:auto}
+.barc{height:14px;border-radius:4px;background:var(--accent)}
+.term{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline dotted;cursor:help;font:inherit}
+.tip{position:absolute;z-index:30;max-width:280px;background:var(--panel2);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:.88rem;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.mini{display:grid;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px;max-width:320px}
+.fq{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.fq.ok{border-color:var(--ok)} .fq.no{border-color:var(--no)}
+.fq .qh{display:flex;gap:10px;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+.fq .qn{font-family:var(--mono);color:var(--accent);font-weight:700}
+.fq .exp{background:var(--no-soft);border-radius:8px;padding:8px 12px;font-size:.92rem}
+.scoreline{font-family:var(--display);font-size:2.2rem;font-weight:900}
+.qchips{display:flex;flex-wrap:wrap;gap:6px}
+.qchips button{width:40px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-family:var(--mono);font-weight:700}
+.qchips button.ok{color:var(--ok);border-color:var(--ok)} .qchips button.no{color:var(--no);border-color:var(--no)}
+body.still *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="stack" style="gap:6px"><p class="eyebrow">Regents Chemistry · Isotopes</p><h1>Isotope Lab</h1>
+    <p class="sub">Discovering isotopes and calculating average atomic mass, from carbon-12 to the 35.45 on the periodic table.</p></div>
+  <div class="tools">
+    <label class="small muted" for="modeSel">Class length</label><select id="modeSel"><option value="30">30 min (streamlined)</option><option value="40">40 min</option><option value="45">45 min (+ extension)</option></select>
+    <label class="small muted" for="lvlSel">Level</label><select id="lvlSel"><option value="1">Beginning</option><option value="2">Developing</option><option value="3">Approaching</option><option value="4">Proficient</option></select>
+    <button class="btn ghost sm" id="calcBtn" aria-expanded="false">Calculator</button>
+    <button class="btn ghost sm" id="motionBtn" aria-pressed="false">Reduce motion: off</button>
+  </div>
+</div></header>
+<main class="wrap">
+  <details class="goals"><summary>Learning goals</summary><div class="g">
+    <p><b>Essential question:</b> How do isotopes of the same element differ, and how does their relative abundance determine an element’s average atomic mass?</p>
+    <p><b>Today I will</b> investigate isotopes and calculate the weighted average atomic mass of elements. <b>So I can</b> explain how different neutron numbers produce isotopes and how abundance shapes average atomic mass.</p>
+    <div><b>I am successful when I can:</b><ol><li>Define an isotope.</li><li>Find protons, neutrons, and electrons in neutral isotopes.</li><li>Explain why isotopes of an element have different mass numbers.</li><li>Distinguish atomic number, mass number, and average atomic mass.</li><li>Interpret isotope notation.</li><li>Explain percent abundance.</li><li>Convert percent abundance to decimal form.</li><li>Calculate average atomic mass as a weighted average.</li><li>Predict which isotope contributes most.</li><li>Interpret average atomic mass on the periodic table.</li></ol></div>
+    <p class="small muted">NYSSLS HS-PS1-1 · Practices: using models, analyzing data, mathematical reasoning.</p></div></details>
+  <nav class="rail" id="rail" aria-label="Modules"></nav>
+  <div class="progress" id="progress"></div>
+  <div id="views"></div>
+</main>
+<div class="mini" id="calc" hidden style="position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:35;width:min(320px,calc(100vw - 32px))">
+  <div class="row" style="justify-content:space-between"><b>Calculator</b><button class="btn ghost sm" id="calcClose">Close</button></div>
+  <input id="calcIn" aria-label="Expression, for example 10*0.75+11*0.25" placeholder="10*0.75 + 11*0.25" autocomplete="off">
+  <div class="row"><button class="btn sm" id="calcGo">=</button><span class="big" id="calcOut" aria-live="polite" style="font-size:1.2rem"></span></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PI=Math.PI;
+const SYM=['','H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si','P','S','Cl','Ar','K','Ca','Sc','Ti','V','Cr','Mn','Fe','Co','Ni','Cu','Zn'];
+const NAME=['','Hydrogen','Helium','Lithium','Beryllium','Boron','Carbon','Nitrogen','Oxygen','Fluorine','Neon','Sodium','Magnesium','Aluminum','Silicon','Phosphorus','Sulfur','Chlorine','Argon','Potassium','Calcium','Scandium','Titanium','Vanadium','Chromium','Manganese','Iron','Cobalt','Nickel','Copper','Zinc'];
+const STABLE={1:[1,2],2:[3,4],3:[6,7],4:[9],5:[10,11],6:[12,13],7:[14,15],8:[16,17,18],9:[19],10:[20,21,22],11:[23],12:[24,25,26],13:[27],14:[28,29,30],15:[31],16:[32,33,34,36],17:[35,37],18:[36,38,40],19:[39,41],20:[40,42,43,44,46,48]};
+const RADIO={1:[3],6:[11,14],8:[15],11:[22,24],15:[32],17:[36],19:[40]};
+/* isotopic masses (u) and representative abundances (%) — IUPAC; chlorine uses the lesson's approximate values */
+const DATA={
+ X:{name:'Element X (hypothetical)',iso:[['X-10',10,75],['X-11',11,25]],pt:null,note:'Instructional approximation: isotope masses equal mass numbers.'},
+ B:{name:'Boron',iso:[['B-10',10.012937,19.9],['B-11',11.009305,80.1]],pt:10.81},
+ C:{name:'Carbon',iso:[['C-12',12.000000,98.93],['C-13',13.003355,1.07]],pt:12.011},
+ Ne:{name:'Neon',iso:[['Ne-20',19.992440,90.48],['Ne-21',20.993847,0.27],['Ne-22',21.991385,9.25]],pt:20.180},
+ Mg:{name:'Magnesium',iso:[['Mg-24',23.985042,78.99],['Mg-25',24.985837,10.00],['Mg-26',25.982593,11.01]],pt:24.305},
+ S:{name:'Sulfur',iso:[['S-32',31.972071,94.99],['S-33',32.971459,0.75],['S-34',33.967867,4.25],['S-36',35.967081,0.01]],pt:32.06},
+ Cl:{name:'Chlorine',iso:[['Cl-35',34.969,75.78],['Cl-37',36.966,24.22]],pt:35.45},
+ Cu:{name:'Copper',iso:[['Cu-63',62.929598,69.15],['Cu-65',64.927790,30.85]],pt:63.546}};
+function shells(e){if(e<=0)return[];if(e<=2)return[e];if(e<=10)return[2,e-2];if(e<=18)return[2,8,e-10];if(e<=20)return[2,8,8,e-18];return[2,8,8,2]}
+const numv=v=>{const t=String(v==null?'':v).trim().replace(/,/g,'');return /^-?\d*\.?\d+$/.test(t)?parseFloat(t):NaN};
+const close=(v,t,tol)=>!Number.isNaN(v)&&Math.abs(v-t)<=tol;
+const r2=x=>Math.round(x*100)/100;
+
+/* state */
+const KEY='isotope-lab-v1';
+const DEF=()=>({v:1,view:'m1',mode:40,level:2,still:false,
+ m1:{sel:12,mc:{},qc:null},
+ m2:{p:17,n:18,e:17,inv:false,mc:null,dec:{},msg:''},
+ m3:{a:80,seen:{},mc:{}},
+ m4:{g:{},gstep:0,cl:{},clstep:0,calc:null,ans:''},
+ m5:{st:{},i:0},
+ ext:{v:{},ok:{}},
+ fin:{ans:{},res:null,retry:false,name:''}});
+function load(){const d=DEF();try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.v===1)for(const k in d){if(s[k]!==undefined)d[k]=(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k]))?Object.assign(d[k],s[k]):s[k]}}catch(e){}return d}
+let S=load();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const short=()=>S.mode===30;
+function sshuf(n,seed){let s=[...String(seed)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){s=(Math.imul(s,1103515245)+12345)>>>0;const j=(s>>>8)%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* drawing */
+function nucleus(p,n,R){const N=p+n;if(!N)return'';const pr=Math.min(7,R/Math.sqrt(N)*.95),c=pr*1.1,a=[];let pc=0;for(let i=0;i<N;i++){const w=Math.round((i+1)*p/N);if(w>pc){a.push(1);pc++}else a.push(0)}
+  let s='';for(let i=N-1;i>=0;i--){const r=c*Math.sqrt(i+.5),t=i*2.39996,x=(r*Math.cos(t)).toFixed(1),y=(r*Math.sin(t)).toFixed(1);s+=`<circle cx="${x}" cy="${y}" r="${pr.toFixed(1)}" fill="${a[i]?'var(--pro)':'var(--neu)'}" stroke="#0c1220" stroke-width=".7"/>`;if(pr>=4.5)s+=`<text x="${x}" y="${y}" font-size="${(pr*1.15).toFixed(1)}" fill="#fff">${a[i]?'+':'n'}</text>`}return s}
+function atomSVG(p,n,e,o={}){const sh=shells(e),R0=o.R||30,RAD=[R0+24,R0+50,R0+76,R0+102];let s=`<circle r="${R0+4}" fill="rgba(255,90,95,.07)"/>`;
+  sh.forEach((cnt,si)=>{s+=`<circle class="shell" r="${RAD[si]}"/>`;for(let j=0;j<cnt;j++){const t=-PI/2+j/cnt*2*PI+si*.4,x=(RAD[si]*Math.cos(t)).toFixed(1),y=(RAD[si]*Math.sin(t)).toFixed(1);s+=`<circle cx="${x}" cy="${y}" r="7" fill="var(--ele)" stroke="#0c1220" stroke-width="1.4"/><text x="${x}" y="${y}" font-size="9" fill="#0c1220">−</text>`}});
+  s+=nucleus(p,n,R0);const vb=(sh.length?RAD[sh.length-1]:R0)+16;
+  return `<svg class="atom" viewBox="${-vb} ${-vb} ${2*vb} ${2*vb}" role="img" aria-label="${esc(o.label||`${p} protons (red, +), ${n} neutrons (blue, n), ${e} electrons (grey, −)`)}">${s}</svg>`}
+const iso=(A,Z,s,cls='lg')=>`<span class="iso ${cls}" aria-label="${s}-${A}: mass number ${A}, atomic number ${Z}"><span class="iso-n"><span>${A}</span><span>${Z}</span></span><span class="iso-s">${s}</span></span>`;
+const LEG=`<div class="legend"><span><i class="dot p"></i>p⁺ · Proton (red, +1)</span><span><i class="dot n"></i>n · Neutron (blue, 0)</span><span><i class="dot e"></i>e⁻ · Electron (grey, −1)</span></div>`;
+const TERMS={isotope:'Atoms of the same element (same number of protons) with different numbers of neutrons.','mass number':'Protons + neutrons in one specific isotope. Always a whole number.','atomic number':'The number of protons. It identifies the element.','percent abundance':'The percentage of an element’s atoms that are a particular isotope.','isotopic mass':'The measured mass of one isotope, in atomic mass units (u or amu).','average atomic mass':'The weighted average of the masses of an element’s naturally occurring isotopes. This is the decimal on the periodic table.','weighted average':'An average where each value counts in proportion to how common it is.'};
+const T=(w,label)=>`<button class="term" data-term="${w}">${label||w}</button>`;
+const keyIdea=t=>S.level===1?`<p class="keyidea"><b>Key idea:</b> ${t}</p>`:'';
+const starter=t=>S.level<=2?`<p class="starter">Sentence starter: ${t}</p>`:'';
+const hintsOn=()=>S.level<4;
+
+/* MC widget */
+const mcOk=(q,v)=>v!=null&&!!q.o[v][1];
+function mc(el,q,key,get,set,onAns){const nm='mc-'+key;
+  el.innerHTML=`<fieldset class="mc"><legend>${q.q}</legend>${sshuf(q.o.length,key).map(i=>`<label class="opt"><input type="radio" name="${nm}" value="${i}" id="${nm}-${i}"><span>${q.o[i][0]}</span></label>`).join('')}<div class="row"><button class="btn sm" data-a="mc">Check answer</button></div><p class="fb" aria-live="polite"></p></fieldset>`;
+  const fb=$('.fb',el),show=i=>{const o=q.o[i];fb.className='fb '+(o[1]?'ok':'no');fb.textContent=(o[1]?'Correct. ':'Not quite. ')+(o[2]||'')};
+  const cur=get();if(cur!=null){const r=$(`input[value="${cur}"]`,el);if(r)r.checked=true;show(cur)}
+  $('[data-a=mc]',el).addEventListener('click',()=>{const r=$('input:checked',el);if(!r){fb.className='fb no';fb.textContent='Choose an answer first.';return}set(+r.value);save();show(+r.value);onAns&&onAns();refresh()})}
+function head(k,title,sub,mins){const i=MODS.findIndex(m=>m[0]===k);return `<div class="shead"><div class="t"><p class="eyebrow">${k==='fin'?'Module 6 · Mastery assessment':k==='ext'?'Optional extension':'Module '+(i+1)} · ${mins} min</p><h2>${title}</h2><p class="muted">${sub}</p></div><button class="btn ghost sm" data-reset="${k}">Reset</button></div>`}
+
+/* ===== M1 ===== */
+const M1Q=[
+ {q:'What is the same about all three atoms?',o:[['The number of protons (6) and electrons (6)',1,'Every carbon atom has 6 protons; neutral atoms also have 6 electrons.'],['The number of neutrons',0,'The neutrons are 6, 7, and 8, so they differ.'],['The mass number',0,'The mass numbers are 12, 13, and 14.'],['Nothing is the same',0,'Count the red protons in each nucleus.']]},
+ {q:'What is different?',o:[['The number of neutrons, so the mass number',1,'Carbon-12, -13, and -14 have 6, 7, and 8 neutrons.'],['The number of protons',0,'All three have 6 protons. Isotopes never differ in protons.'],['The number of electrons',0,'All three neutral atoms have 6 electrons.'],['The element',0,'All three are carbon.']]},
+ {q:'Why are all three atoms considered carbon?',o:[['They all have 6 protons, and the number of protons identifies the element.',1,'Atomic number = protons = 6 = carbon.'],['They all have the same mass.',0,'Their masses differ.'],['They all have 6 neutrons.',0,'Only carbon-12 has 6 neutrons.'],['They are all black.',0,'Color is not how scientists identify elements.']]},
+ {q:'Why do they have different mass numbers?',o:[['Mass number = protons + neutrons, and the neutron counts differ.',1,'6 + 6 = 12, 6 + 7 = 13, 6 + 8 = 14.'],['They have different numbers of electrons.',0,'Electrons are not counted in the mass number.'],['They have different numbers of protons.',0,'All have 6 protons.'],['Mass numbers are random.',0,'Mass number is the sum of protons and neutrons.']]}];
+const M1C={q:'Which change creates a different isotope of the same element?',o:[['Add a proton',0,'Adding a proton makes a different element.'],['Remove a proton',0,'Removing a proton also changes the element.'],['Add a neutron',1,'Changing the neutron count changes the isotope; the protons keep the element the same.'],['Remove an electron',0,'That makes an ion, not a new isotope.']]};
+function V_m1(){const st=S.m1,A=st.sel,n=A-6,all=M1Q.every((q,i)=>mcOk(q,st.mc[i])),qs=short()?[0,1]:[0,1,2,3];
+ return `<section>${head('m1','Discover isotopes','Click each carbon atom and compare what is inside.','5')}
+ <div class="grid3" id="m1c">${[12,13,14].map(a=>`<button class="isocard" data-a="${a}" aria-pressed="${A===a}"><div class="stage">${atomSVG(6,a-6,6,{R:24,label:`Carbon-${a}: 6 protons, ${a-6} neutrons, 6 electrons`})}</div><b>Carbon-${a}</b>${iso(a,6,'C','lg')}</button>`).join('')}</div>${LEG}
+ <div class="grid2"><div class="card"><h3>Carbon-${A}</h3><div class="readout"><div class="ro"><span>Protons</span><b>6</b></div><div class="ro"><span>Neutrons</span><b>${n}</b></div><div class="ro"><span>Electrons (neutral)</span><b>6</b></div><div class="ro"><span>Mass number</span><b>${A}</b></div></div>
+   <div class="tablewrap"><table><thead><tr><th>Isotope</th><th>Protons</th><th>Neutrons</th><th>Electrons</th></tr></thead><tbody>${[12,13,14].map(a=>`<tr><td>Carbon-${a}</td><td>6</td><td style="${a===A?'color:var(--accent);font-weight:700':''}">${a-6}</td><td>6</td></tr>`).join('')}</tbody></table></div>
+   <p class="small muted">Same protons (6) · different neutrons · different mass numbers. Carbon-12 and carbon-13 are stable; carbon-14 is radioactive.</p></div>
+  <div class="card"><h3>Student investigation</h3><div class="stack" id="m1q"></div></div></div>
+ ${qs.every(i=>mcOk(M1Q[i],st.mc[i]))?`<div class="note ok"><b>Scientific conclusion:</b> ${T('isotope','Isotopes')} are atoms of the same element that contain the same number of protons but different numbers of neutrons.</div><div class="card"><h3>Quick check</h3><div id="m1k"></div></div>`:''}</section>`}
+function wire_m1(){const st=S.m1;$('#m1c').onclick=e=>{const b=e.target.closest('[data-a]');if(b){st.sel=+b.dataset.a;save();show('m1')}};
+ const box=$('#m1q');(short()?[0,1]:[0,1,2,3]).forEach(i=>{const d=document.createElement('div');box.appendChild(d);mc(d,M1Q[i],'m1q'+i,()=>st.mc[i],v=>st.mc[i]=v,()=>{if((short()?[0,1]:[0,1,2,3]).every(j=>mcOk(M1Q[j],st.mc[j]))&&!$('#m1k'))show('m1')})});
+ const k=$('#m1k');if(k)mc(k,M1C,'m1k',()=>st.qc,v=>st.qc=v)}
+
+/* ===== M2 ===== */
+const M2Q={q:'What changed when chlorine-35 became chlorine-37?',o:[['The number of neutrons increased by two.',1,'18 → 20 neutrons; still 17 protons, so still chlorine.'],['The number of protons increased by two.',0,'Then it would be potassium (19 protons).'],['Two electrons were added.',0,'Electrons do not change the mass number.'],['Nothing changed.',0,'The mass number went from 35 to 37.']]};
+const DEC=[[23,11],[24,12],[27,13],[37,17]];
+function stab(p,n){if(!p)return'No protons: not an element';const A=p+n;if((STABLE[p]||[]).includes(A))return'Stable isotope';if((RADIO[p]||[]).includes(A))return'Radioactive isotope';return'Unstable or not found in nature'}
+function V_m2(){const st=S.m2,{p,n,e}=st,A=p+n,ch=p-e,list=short()?[DEC[0],DEC[3]]:DEC;
+ return `<section>${head('m2','Build and compare isotopes','Add and remove particles. The element is identified by its protons.','7')}
+ <div class="grid2"><div class="card"><div class="stage" id="m2atom">${atomSVG(p,n,e,{R:p+n>30?36:28})}</div>${LEG}
+   <div class="stack" style="gap:8px">${[['p','Protons'],['n','Neutrons'],['e','Electrons']].map(([k,l])=>`<div class="ctrl"><span class="nm">${l}</span><button data-d="${k},-1" aria-label="Remove ${l.toLowerCase().slice(0,-1)}">−</button><output>${st[k]}</output><button data-d="${k},1" aria-label="Add ${l.toLowerCase().slice(0,-1)}">+</button></div>`).join('')}</div>
+   <div class="row"><button class="btn ghost sm" id="m2reset">Reset atom (chlorine-35)</button></div><p class="fb" id="m2msg" aria-live="polite">${esc(st.msg||'')}</p></div>
+  <div class="card"><div class="readout">${[['Element',p?NAME[p]:'—'],['Symbol',p?SYM[p]:'—'],['Atomic number',p],['Mass number',A],['Protons',p],['Neutrons',n],['Electrons',e],['Net charge',ch===0?'0 (neutral)':(ch>0?'+':'−')+Math.abs(ch)]].map(([k,v])=>`<div class="ro"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+   <p>${p?`${NAME[p]}-${A} &nbsp; ${iso(A,p,SYM[p],'lg')} &nbsp;<span class="badge">${stab(p,n)}</span>`:''}</p>
+   <p class="small muted">${T('atomic number','Atomic number')} = protons · ${T('mass number','Mass number')} = protons + neutrons · Neutrons = mass number − atomic number · Neutral atom: electrons = protons</p>
+   <div class="note"><b>Investigation A:</b> Start with chlorine-35 (17 p, 18 n, 17 e). Build chlorine-37.${st.inv?' <b style="color:var(--ok)">✓ Chlorine-37 built.</b>':''}</div>
+   ${st.inv?'<div id="m2q"></div>':''}</div></div>
+ <div class="card"><h3>Investigation B: decode isotope notation</h3><div class="stack" id="m2dec">${list.map(([A2,Z])=>{const s=st.dec[A2+'-'+Z]||{v:{},ok:{}};return `<div class="grid2" style="align-items:center;border-top:1px solid var(--line);padding-top:10px" data-dec="${A2}-${Z}"><div>${iso(A2,Z,SYM[Z],'xl')}</div><div class="stack" style="gap:8px"><div class="fields">${[['Z','Atomic number'],['A','Mass number'],['p','Protons'],['n','Neutrons'],['e','Electrons (neutral)']].map(([k,l])=>`<label class="fld">${l}<input data-k="${k}" inputmode="numeric" value="${esc(s.v[k]||'')}" class="${s.ok[k]?'ok':''}" ${s.ok[k]?'disabled':''} aria-label="${SYM[Z]}-${A2} ${l}"></label>`).join('')}</div>
+   <div class="row"><button class="btn sm" data-chk>Check answer</button><button class="btn ghost sm" data-hint ${hintsOn()?'':'disabled'}>Show hint</button></div><p class="fb" data-fb>${s.solved?'Correct.':''}</p></div></div>`}).join('')}</div>
+   <div class="row"><button class="btn ghost sm" id="m2more">Try another isotope</button></div><div id="m2extra"></div></div></section>`}
+function m2check(row,A,Z,stv){const want={Z,A,p:Z,n:A-Z,e:Z};let msg='';Object.keys(want).forEach(k=>{const i=$(`[data-k="${k}"]`,row);if(stv.ok[k])return;const v=numv(i.value);stv.v[k]=i.value;const ok=v===want[k];i.classList.toggle('ok',ok);i.classList.toggle('no',!ok);if(ok){stv.ok[k]=true;i.disabled=true}else if(!msg)msg=k==='n'&&v===A?'Neutrons = mass number − atomic number. Subtract.':k==='Z'&&v===A?'The top number is the mass number. Atomic number is on the bottom.':k==='n'&&v===A+Z?'Subtract, don’t add.':`Check ${({Z:'the atomic number (bottom number)',A:'the mass number (top number)',p:'protons (= atomic number)',n:'neutrons (mass number − atomic number)',e:'electrons (= protons in a neutral atom)'})[k]}.`});
+ const all=Object.keys(want).every(k=>stv.ok[k]);if(all)stv.solved=true;const fb=$('[data-fb]',row);fb.className='fb '+(all?'ok':'no');fb.textContent=all?`Correct: ${NAME[Z]}-${A} has ${Z} p, ${A-Z} n, ${Z} e.`:msg;save();refresh()}
+function wire_m2(){const st=S.m2;
+ $$('[data-d]').forEach(b=>b.onclick=()=>{const[k,d]=b.dataset.d.split(',');const nv=st[k]+ +d;if(nv<0||nv>(k==='n'?30:20)){st.msg=nv<0?'You can’t go below zero.':'This model stops there.';show('m2');return}st[k]=nv;st.msg='';
+   if(k==='p')st.msg=`Changing protons changed the element to ${NAME[st.p]||'nothing'}. Isotopes keep the same number of protons.`;
+   if(st.p===17&&st.n===20&&st.e===17&&!st.inv){st.inv=true;st.msg='Chlorine-37 built: 17 protons, 20 neutrons, 17 electrons.'}save();show('m2');refresh()});
+ $('#m2reset').onclick=()=>{st.p=17;st.n=18;st.e=17;st.msg='';save();show('m2')};
+ const q=$('#m2q');if(q)mc(q,M2Q,'m2q',()=>st.mc,v=>st.mc=v);
+ $('#m2dec').addEventListener('click',e=>{const row=e.target.closest('[data-dec]');if(!row)return;const[A,Z]=row.dataset.dec.split('-').map(Number),key=A+'-'+Z,s=st.dec[key]=st.dec[key]||{v:{},ok:{},h:0};
+   if(e.target.closest('[data-chk]'))m2check(row,A,Z,s);
+   if(e.target.closest('[data-hint]')){s.h=(s.h||0)+1;const H=['The bottom number is the atomic number (protons). The top number is the mass number.',`Protons = ${Z}. In a neutral atom, electrons = protons.`,`Neutrons = mass number − atomic number = ${A} − ${Z}.`];const fb=$('[data-fb]',row);fb.className='fb';fb.innerHTML=`<span class="hint" style="display:inline-block">Hint ${Math.min(3,s.h)}: ${H[Math.min(2,s.h-1)]}</span>`;save()}});
+ $('#m2more').onclick=()=>{const pool=[];for(const z in STABLE)STABLE[z].forEach(a=>pool.push([a,+z]));const[A,Z]=pool[Math.floor(Math.random()*pool.length)],s={v:{},ok:{}};
+   const box=$('#m2extra');box.innerHTML=`<div class="grid2" style="align-items:center;border-top:1px solid var(--line);padding-top:10px" data-x><div>${iso(A,Z,SYM[Z],'xl')}</div><div class="stack" style="gap:8px"><div class="fields">${[['Z','Atomic number'],['A','Mass number'],['p','Protons'],['n','Neutrons'],['e','Electrons (neutral)']].map(([k,l])=>`<label class="fld">${l}<input data-k="${k}" inputmode="numeric" aria-label="${l}"></label>`).join('')}</div><div class="row"><button class="btn sm" data-xchk>Check answer</button></div><p class="fb" data-fb></p></div></div>`;
+   $('[data-xchk]',box).onclick=()=>m2check($('[data-x]',box),A,Z,s)}}
+
+/* ===== M3 ===== */
+const M3Q=[{q:'In Scenario 3 (20% A, 80% B), which isotope is more abundant?',o:[['Isotope B (11 amu)',1,'80% of the atoms are isotope B.'],['Isotope A (10 amu)',0,'Only 20% are isotope A.'],['They are equal',0,'That is Scenario 1.']]},
+ {q:'Which scenario has the greatest average atomic mass?',o:[['Scenario 3: 20% A, 80% B',1,'More of the heavier isotope pulls the average up, toward 11.'],['Scenario 2: 80% A, 20% B',0,'Mostly the lighter isotope gives the lowest average.'],['Scenario 1: 50% A, 50% B',0,'Equal amounts give exactly 10.5, the middle.'],['They are all the same',0,'Watch the average change as you move the slider.']]},
+ {q:'Why does the average move toward the more abundant isotope?',o:[['It is a weighted average: the isotope with more atoms counts more.',1,'Each isotope’s mass is weighted by its fraction of the atoms.'],['The heavier isotope always controls the average.',0,'Not true: in Scenario 2 the average is close to the lighter isotope.'],['The average is always halfway between the masses.',0,'That is a simple average. It only happens at 50/50.'],['Isotopes occur in equal amounts.',0,'Natural isotopes usually have different abundances.']]}];
+const SCN=[[50,'Scenario 1: 50% A / 50% B'],[80,'Scenario 2: 80% A / 20% B'],[20,'Scenario 3: 20% A / 80% B']];
+function V_m3(){const st=S.m3,a=st.a,b=100-a,avg=(10*a+11*b)/100,need=short()?[80,20]:[50,80,20],seen=need.every(x=>st.seen[x]);
+ return `<section>${head('m3','Explore percent abundance','A sample of 100 atoms of a hypothetical element. Move the slider and watch the average atomic mass.','6')}
+ <div class="grid2"><div class="card"><div class="pop" id="m3pop" role="img" aria-label="${a} atoms of isotope A and ${b} atoms of isotope B"></div>
+   <div class="legend"><span><b style="color:var(--isoA)">○ A</b> Isotope A: 10 amu</span><span><b style="color:var(--isoB)">□ B</b> Isotope B: 11 amu</span></div>
+   <p class="caption">Isotope markers use shape and letter, not particle colors. Masses are an instructional approximation.</p></div>
+  <div class="card"><label for="m3s"><b>Isotope A: <span id="m3a">${a}</span>%</b> · Isotope B: <span id="m3b">${b}</span>%</label><input type="range" id="m3s" min="0" max="100" step="1" value="${a}">
+   <div class="row">${SCN.filter(s=>need.includes(s[0])).map(([v,l])=>`<button class="btn ghost sm" data-sc="${v}" aria-pressed="${a===v}">${l}${st.seen[v]?' ✓':''}</button>`).join('')}</div>
+   <div><span class="small muted">${T('average atomic mass','Average atomic mass')}</span><div class="big" id="m3avg">${avg.toFixed(2)} amu</div></div>
+   <div class="scale" id="m3scale"></div>
+   <p class="small muted">Solid purple dot: weighted average. Dashed circle below the line: simple average (10.50), which ignores abundance.</p>
+   <p class="note"><b>${T('percent abundance','Percent abundance')}</b> tells us what percentage of atoms in a sample belong to a particular isotope.</p></div></div>
+ ${seen?`<div class="card"><h3>Student investigation</h3><div class="stack" id="m3q"></div></div>`:`<p class="muted small">Visit each scenario button to unlock the questions.</p>`}
+ ${seen&&M3Q.every((q,i)=>mcOk(q,st.mc[i]))?`<div class="note ok"><b>Discovery:</b> The average atomic mass is closer to the mass of the isotope with the greater relative abundance. It is a ${T('weighted average')}, not a simple average.</div>`:''}</section>`}
+function m3draw(){const a=S.m3.a,b=100-a,avg=(10*a+11*b)/100;const cells=Array.from({length:100},(_,i)=>i<a?'A':'B');
+ $('#m3pop').innerHTML=cells.map(c=>`<span class="${c}">${c}</span>`).join('');$('#m3pop').setAttribute('aria-label',`${a} atoms of isotope A and ${b} atoms of isotope B`);
+ $('#m3a').textContent=a;$('#m3b').textContent=b;$('#m3avg').textContent=avg.toFixed(2)+' amu';
+ const X=v=>((v-10)/1*100).toFixed(1)+'%';$('#m3scale').innerHTML=`<div class="ln"></div>${[10,10.25,10.5,10.75,11].map(v=>`<div class="tk" style="left:${X(v)}"></div><div class="tl" style="left:${X(v)}">${v===10?'10 (A)':v===11?'11 (B)':v}</div>`).join('')}<div class="mk simple" style="left:${X(10.5)}"><i></i></div><div class="mk" style="left:${X(avg)}"><span>${avg.toFixed(2)}</span><i></i></div>`;
+ $$('[data-sc]').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.sc===a)))}
+function wire_m3(){const st=S.m3;m3draw();$('#m3s').oninput=e=>{st.a=+e.target.value;save();m3draw()};
+ $$('[data-sc]').forEach(b=>b.onclick=()=>{const v=+b.dataset.sc,was=(short()?[80,20]:[50,80,20]).every(x=>st.seen[x]);st.a=v;st.seen[v]=true;save();if(!was&&(short()?[80,20]:[50,80,20]).every(x=>st.seen[x]))show('m3');else{m3draw();if(!b.textContent.includes('✓'))b.textContent+=' ✓'}});
+ const box=$('#m3q');if(box)M3Q.forEach((q,i)=>{const d=document.createElement('div');box.appendChild(d);mc(d,q,'m3q'+i,()=>st.mc[i],v=>st.mc[i]=v,()=>{if(M3Q.every((q,j)=>mcOk(q,st.mc[j])))show('m3')})})}
+
+/* ===== M4 ===== */
+const GSTEPS=[{t:'Step 1: Convert percent to decimal',f:[['d1','75% →',0.75,.001],['d2','25% →',0.25,.001]],h:'Divide each percent by 100 (move the decimal point two places left).'},
+ {t:'Step 2: Multiply each mass by its decimal abundance',f:[['m1','10 × 0.75 =',7.5,.001],['m2','11 × 0.25 =',2.75,.001]],h:'Multiply the isotope mass by its decimal abundance.'},
+ {t:'Step 3: Add the products',f:[['s','7.50 + 2.75 =',10.25,.001]],h:'Add the two weighted contributions. The answer is the average atomic mass.'}];
+const CSTEPS=[{t:'Step 1: Convert to decimals',f:[['d1','75.78% →',0.7578,.0001],['d2','24.22% →',0.2422,.0001]],h:'Divide by 100: 75.78 ÷ 100.'},
+ {t:'Step 2: Multiply',f:[['m1','34.969 × 0.7578 =',26.4995,.01],['m2','36.966 × 0.2422 =',8.9532,.01]],h:'Use the calculator. Round to two decimal places.'},
+ {t:'Step 3: Add',f:[['s','sum =',35.4527,.02]],h:'Add your two products.'}];
+function stepper(id,steps,store,key){const cur=store[key+'step']||0;return `<div class="steps" id="${id}">${steps.map((s,i)=>`<div class="stepc ${i>cur?'lock':''}" data-step="${i}"><b>${s.t}</b>${i>cur?'<span class="small muted">Complete the step above first.</span>':`<div class="rowf">${s.f.map(([k,l])=>`<label class="eq">${l} <input data-sk="${k}" inputmode="decimal" autocomplete="off" value="${esc((store[key]||{})[k]||'')}" ${i<cur?'disabled class="ok"':''} aria-label="${l}"></label>`).join('')}</div>${i===cur?`<div class="row"><button class="btn sm" data-scheck="${i}">Check</button>${hintsOn()?`<button class="btn ghost sm" data-shint="${i}">Hint</button>`:''}</div><p class="fb" data-sfb="${i}"></p>`:''}`}</div>`).join('')}</div>`}
+function wireStepper(id,steps,store,key,onDone){const box=$('#'+id);store[key]=store[key]||{};
+ box.addEventListener('input',e=>{const i=e.target.closest('[data-sk]');if(i){store[key][i.dataset.sk]=i.value;save()}});
+ box.addEventListener('click',e=>{const c=e.target.closest('[data-scheck]'),h=e.target.closest('[data-shint]');
+  if(h){const s=steps[+h.dataset.shint];$(`[data-sfb="${h.dataset.shint}"]`,box).innerHTML=`<span class="hint" style="display:inline-block">${s.h}</span>`}
+  if(c){const i=+c.dataset.scheck,s=steps[i];let bad=null;s.f.forEach(([k,,want,tol])=>{const inp=$(`[data-sk="${k}"]`,box),v=numv(inp.value),ok=close(v,want,tol);inp.classList.toggle('ok',ok);inp.classList.toggle('no',!ok);if(!ok&&!bad)bad=[k,v,want]});
+   const fb=$(`[data-sfb="${i}"]`,box);if(!bad){store[key+'step']=i+1;save();if(i+1>=steps.length){onDone&&onDone();return}const tmp=document.createElement('div');tmp.innerHTML=stepper(id,steps,store,key);box.innerHTML=$('#'+id,tmp).innerHTML;return}
+   const[k,v,want]=bad;fb.className='fb no';fb.textContent=k.startsWith('d')&&close(v,want*100,.01)?'Convert the percent to a decimal first: divide by 100.':k==='s'&&id==='gst'&&close(v,10.5,.001)?'10.50 is the simple average. A weighted average uses the abundances.':k==='s'&&close(v,want/1000*1000*1,0)?'':'Not quite. Check your arithmetic'+(hintsOn()?' or use a hint.':'.')}});}
+function avgOf(rows){return rows.reduce((a,[,m,p])=>a+m*p/100,0)}
+function V_m4(){const st=S.m4,gDone=(st.gstep||0)>=3,cDone=(st.clstep||0)>=3;const sel=st.calc||'Cl';const D=DATA[sel];
+ return `<section>${head('m4','Calculate average atomic mass','Use isotope masses and percent abundances to find the weighted average.','10')}
+ <div class="card"><h3>The formula</h3><p class="eq" style="font-size:1.2rem">Average atomic mass = Σ (isotope mass × fractional abundance)</p><p class="eq">Two isotopes: (mass₁ × abundance₁) + (mass₂ × abundance₂)</p><p class="small">Convert percent to decimal first: 75% = 0.75, 25% = 0.25.</p>${keyIdea('Percent ÷ 100 = decimal. Then multiply and add.')}</div>
+ <div class="grid2"><div class="card"><h3>Part B · Guided: element X</h3><div class="tablewrap"><table><thead><tr><th>Isotope</th><th>Mass</th><th>Abundance</th></tr></thead><tbody><tr><td>X-10</td><td>10 amu</td><td>75%</td></tr><tr><td>X-11</td><td>11 amu</td><td>25%</td></tr></tbody></table></div><p class="caption">Instructional approximation: masses equal mass numbers.</p>${stepper('gst',GSTEPS,st,'g')}${gDone?'<p class="fb ok">Average atomic mass = 10.25 amu. It is closer to 10 because X-10 is more abundant.</p>':''}</div>
+  <div class="card"><h3>Part C · Real world: chlorine</h3><div class="tablewrap"><table><thead><tr><th>Isotope</th><th>Isotopic mass</th><th>Natural abundance</th></tr></thead><tbody><tr><td>Chlorine-35</td><td>34.969 amu</td><td>75.78%</td></tr><tr><td>Chlorine-37</td><td>36.966 amu</td><td>24.22%</td></tr></tbody></table></div>
+   ${gDone||S.level>=3?stepper('cst',CSTEPS,st,'cl'):'<p class="muted small">Finish Part B to unlock chlorine.</p>'}${cDone?`<div class="note ok">You calculated about <b>35.45 amu</b>. The periodic table lists chlorine as <b>35.45</b>. ${iso(35,17,'Cl','lg')} and ${iso(37,17,'Cl','lg')} average to 35.45 because chlorine-35 is about three times as common.</div>`:''}</div></div>
+ <div class="note mis"><b>Keep these straight:</b> ${T('mass number','Mass number')} = protons + neutrons (a whole number). ${T('isotopic mass','Isotopic mass')} = the measured mass of one isotope in amu, close to but not exactly its mass number (chlorine-35 is 34.969 amu). ${T('average atomic mass','Average atomic mass')} = the weighted average of isotopic masses and natural abundances, usually not a whole number.</div>
+ <div class="card"><h3>Average atomic mass calculator</h3><div class="row"><label for="m4el">Element</label><select id="m4el">${Object.entries(DATA).map(([k,d])=>`<option value="${k}" ${k===sel?'selected':''}>${d.name}</option>`).join('')}</select><button class="btn ghost sm" id="m4add">Add isotope row</button></div>
+  <div class="tablewrap"><table class="calc"><thead><tr><th>Isotope</th><th>Isotopic mass (amu)</th><th>Abundance (%)</th><th>Decimal</th><th>Mass × decimal</th><th>Contribution</th></tr></thead><tbody id="m4rows"></tbody></table></div>
+  <p class="fb" id="m4sum"></p>
+  <div class="row"><label class="fld" style="max-width:220px" for="m4ans">Your average atomic mass (amu)<input id="m4ans" inputmode="decimal" value="${esc(st.ans||'')}"></label><button class="btn sm" id="m4chk">Check answer</button><button class="btn ghost sm" id="m4show">Show steps</button></div>
+  <p class="fb" id="m4fb"></p><div id="m4steps"></div>${D.note?`<p class="caption">${D.note}</p>`:'<p class="caption">Isotopic masses from IUPAC; abundances rounded. Chlorine uses the lesson’s approximate values.</p>'}</div></section>`}
+let calcRows=null;
+function m4draw(){const tb=$('#m4rows');const tot=calcRows.reduce((a,r)=>a+(numv(r[2])||0),0),ok100=Math.abs(tot-100)<=0.011;
+ tb.innerHTML=calcRows.map((r,i)=>{const m=numv(r[1]),p=numv(r[2]),d=Number.isNaN(p)?'':(p/100).toFixed(4),pr=(Number.isNaN(m)||Number.isNaN(p))?'':(m*p/100).toFixed(4);const w=Number.isNaN(p)?0:Math.max(0,Math.min(100,p));
+  return `<tr><td><input data-c="${i},0" value="${esc(r[0])}" aria-label="Isotope name row ${i+1}" style="max-width:90px"></td><td><input data-c="${i},1" inputmode="decimal" value="${esc(r[1])}" aria-label="Isotopic mass row ${i+1}"></td><td><input data-c="${i},2" inputmode="decimal" value="${esc(r[2])}" aria-label="Abundance row ${i+1}"></td><td>${S.level<=2?d:'<span class="muted">÷100</span>'}</td><td data-pr="${i}">${S.level<=2?pr:''}</td><td style="min-width:90px"><div class="barc" style="width:${w}%"></div></td></tr>`}).join('');
+ const s=$('#m4sum');s.className='fb '+(ok100?'ok':'no');s.textContent=ok100?`Abundances add to 100%.`:`Abundances add to ${tot.toFixed(2)}%. They must add to 100%.`}
+function wire_m4(){const st=S.m4;
+ wireStepper('gst',GSTEPS,st,'g',()=>show('m4'));if($('#cst'))wireStepper('cst',CSTEPS,st,'cl',()=>{show('m4');refresh()});
+ const loadEl=k=>{calcRows=DATA[k].iso.map(([n,m,p])=>[n,String(m),String(p)]);st.calc=k;save()};if(!calcRows||st._loaded!==st.calc)loadEl(st.calc||'Cl');st._loaded=st.calc;m4draw();
+ $('#m4el').onchange=e=>{loadEl(e.target.value);st._loaded=st.calc;$('#m4fb').textContent='';$('#m4steps').innerHTML='';m4draw()};
+ $('#m4add').onclick=()=>{if(calcRows.length<5){calcRows.push(['new','',''] );m4draw()}};
+ $('#m4rows').addEventListener('change',e=>{const c=e.target.closest('[data-c]');if(!c)return;const[i,j]=c.dataset.c.split(',').map(Number);calcRows[i][j]=c.value;m4draw()});
+ $('#m4ans').oninput=e=>{st.ans=e.target.value;save()};
+ const truth=()=>avgOf(calcRows.map(r=>[r[0],numv(r[1]),numv(r[2])]));
+ $('#m4chk').onclick=()=>{const fb=$('#m4fb'),tot=calcRows.reduce((a,r)=>a+(numv(r[2])||0),0);if(Math.abs(tot-100)>0.011){fb.className='fb no';fb.textContent='Fix the abundances first: they must add to 100%.';return}
+  const t=truth(),v=numv(st.ans),simple=calcRows.reduce((a,r)=>a+numv(r[1]),0)/calcRows.length;
+  if(close(v,t,0.01)){fb.className='fb ok';fb.textContent=`Correct: ${t.toFixed(3)} amu.${DATA[st.calc].pt&&calcRows.length===DATA[st.calc].iso.length?` The periodic table value is ${DATA[st.calc].pt}.`:''}`;st.calcOk=true;save();refresh();return}
+  fb.className='fb no';fb.textContent=close(v,simple,0.01)?'That is the simple average of the masses. Weight each mass by its abundance.':Math.round(v)===v&&!close(v,t,.5)?'Average atomic mass is usually not a whole number. Recheck your calculation.':'Not quite. Multiply each mass by its decimal abundance, then add.'};
+ $('#m4show').onclick=()=>{const rows=calcRows.map(r=>[r[0],numv(r[1]),numv(r[2])]);$('#m4steps').innerHTML=`<div class="note">${rows.map(([n,m,p])=>`(${m} × ${(p/100).toFixed(4)}) = ${(m*p/100).toFixed(4)}`).join('<br>')}<br><b>Sum = ${avgOf(rows).toFixed(3)} amu</b></div>`}}
+
+/* ===== M5 ===== */
+const CH=[
+ {k:'c1',t:'Identify an isotope',p:'An atom contains <b>8 protons</b>, <b>10 neutrons</b>, and <b>8 electrons</b>.',fields:[['el','Element'],['Z','Atomic number'],['A','Mass number'],['nm','Isotope name']],check:v=>({el:/^(oxygen|o)$/i.test(String(v.el||'').trim()),Z:numv(v.Z)===8,A:numv(v.A)===18,nm:/^(oxygen|o)\s*-?\s*18$/i.test(String(v.nm||'').trim())}),h:['The number of protons identifies the element.','Mass number = protons + neutrons = 8 + 10.','Write the name as element-mass number, like carbon-14.'],done:'Oxygen-18: atomic number 8, mass number 18.'},
+ {k:'c2',t:'Compare isotopes',mc:{q:'Magnesium-24, magnesium-25, and magnesium-26: which contains the most neutrons?',o:[['Magnesium-26 (14 neutrons)',1,'26 − 12 = 14 neutrons.'],['Magnesium-24',0,'24 − 12 = 12 neutrons, the fewest.'],['Magnesium-25',0,'25 − 12 = 13 neutrons.'],['They all have the same number',0,'They have the same protons (12), not the same neutrons.']]}},
+ {k:'c3',t:'Calculate average atomic mass',p:'A hypothetical element: isotope A is <b>20 amu, 60%</b>; isotope B is <b>22 amu, 40%</b>.',fields:[['avg','Average atomic mass (amu)']],check:v=>({avg:close(numv(v.avg),20.8,.011)}),h:['Convert to decimals: 0.60 and 0.40.','Multiply: 20 × 0.60 and 22 × 0.40.','Add: 12.0 + 8.8.'],done:'(20 × 0.60) + (22 × 0.40) = 12.0 + 8.8 = 20.8 amu.'},
+ {k:'c4',t:'Predict the average',mc:{q:'Two isotopes have masses of 50 amu and 52 amu. The lighter isotope is more abundant. The average atomic mass is closer to',o:[['50 amu',1,'The more abundant isotope pulls the weighted average toward its mass.'],['52 amu',0,'The heavier isotope is less common, so it counts less.'],['exactly 51 amu',0,'51 would require equal abundances.'],['more than 52 amu',0,'An average can never be outside the range of the masses.']]}},
+ {k:'c5',t:'Explain the periodic table',mc:{q:'Why is the average atomic mass of chlorine about 35.45 amu instead of exactly 35 or 37 amu?',o:[['It is a weighted average of chlorine-35 and chlorine-37, and chlorine-35 is much more abundant.',1,'About 76% chlorine-35 and 24% chlorine-37 gives 35.45.'],['Chlorine atoms have half a neutron.',0,'Particles come in whole numbers. Each atom has a whole-number mass number.'],['It is the simple average of 35 and 37.',0,'The simple average is 36. Abundance weighting gives 35.45.'],['Electrons add 0.45 amu.',0,'Electrons are extremely light and are not the reason.']]},write:true}];
+function chList(){return short()?['c1','c3','c5']:['c1','c2','c3','c4','c5']}
+function V_m5(){const st=S.m5;return `<section>${head('m5','Isotope Detective: solve the atomic mystery!','Solve each case. Hints are available if you get stuck.','5')}
+ ${CH.filter(c=>chList().includes(c.k)).map(c=>{const s=st.st[c.k]=st.st[c.k]||{v:{},ok:{},h:0};return `<div class="card" data-ch="${c.k}"><div class="row" style="justify-content:space-between"><h3>Case: ${c.t}</h3>${s.solved?'<span class="badge ok">Solved</span>':''}</div>
+  ${c.mc?`<div data-mc></div>${c.write?`${starter('“Chlorine’s average is 35.45 because…”')}<textarea data-w aria-label="Explain in your own words (optional)" style="min-height:70px" placeholder="Optional: explain in your own words">${esc(s.w||'')}</textarea>`:''}`:`<p>${c.p}</p><div class="fields">${c.fields.map(([k,l])=>`<label class="fld">${l}<input data-f="${k}" autocomplete="off" value="${esc(s.v[k]||'')}" class="${s.ok[k]?'ok':''}" ${s.ok[k]?'disabled':''} aria-label="${l}"></label>`).join('')}</div>
+  <div class="row"><button class="btn sm" data-c>Check</button>${hintsOn()?'<button class="btn ghost sm" data-h>Hint</button>':''}</div><p class="fb" data-fb>${s.solved?c.done:''}</p>`}</div>`}).join('')}</section>`}
+function wire_m5(){const st=S.m5;CH.filter(c=>chList().includes(c.k)).forEach(c=>{const box=$(`[data-ch="${c.k}"]`),s=st.st[c.k];
+ if(c.mc){mc($('[data-mc]',box),c.mc,'m5'+c.k,()=>s.ans,v=>{s.ans=v;s.solved=!!c.mc.o[v][1]});const w=$('[data-w]',box);if(w)w.oninput=()=>{s.w=w.value;save()};return}
+ $$('[data-f]',box).forEach(i=>i.oninput=()=>{s.v[i.dataset.f]=i.value;i.classList.remove('no');save()});
+ $('[data-c]',box).onclick=()=>{const res=c.check(s.v),fb=$('[data-fb]',box);Object.entries(res).forEach(([k,ok])=>{const i=$(`[data-f="${k}"]`,box);i.classList.toggle('ok',ok);i.classList.toggle('no',!ok);if(ok){s.ok[k]=true;i.disabled=true}});
+  if(Object.values(res).every(Boolean)){s.solved=true;fb.className='fb ok';fb.textContent=c.done;save();refresh();return}
+  fb.className='fb no';fb.textContent=c.k==='c3'&&close(numv(s.v.avg),21,.001)?'21 is the simple average. Weight each mass by its abundance.':c.k==='c1'&&!res.A&&numv(s.v.A)===26?'Mass number counts protons and neutrons only, not electrons.':'Not quite. Check the red answers.';save()};
+ const hb=$('[data-h]',box);if(hb)hb.onclick=()=>{s.h=Math.min(3,s.h+1);const fb=$('[data-fb]',box);fb.className='fb';fb.innerHTML=`<span class="hint" style="display:inline-block">Hint ${s.h} of 3: ${c.h[s.h-1]}</span>`;save()}})}
+
+/* ===== EXT ===== */
+function V_ext(){const st=S.ext;return `<section>${head('ext','Find the missing isotopic abundance!','A hypothetical element has isotope A (10 amu) and isotope B (11 amu). Its average atomic mass is 10.8 amu. Find each abundance.','5')}
+ <div class="grid2"><div class="card"><h3>Guided algebra</h3><p>Let <b>x</b> = the decimal abundance of isotope B. Then isotope A is <b>1 − x</b>.</p><p class="eq">10(1 − x) + 11x = 10.8</p><p class="eq">10 − 10x + 11x = 10.8</p><p class="eq">10 + x = 10.8</p>${S.level<=2?'<p class="keyidea">Subtract 10 from both sides to find x.</p>':''}
+  <div class="fields">${[['x','x (decimal for B)'],['pb','Isotope B (%)'],['pa','Isotope A (%)']].map(([k,l])=>`<label class="fld">${l}<input data-e="${k}" inputmode="decimal" value="${esc(st.v[k]||'')}" class="${st.ok[k]?'ok':''}" ${st.ok[k]?'disabled':''}></label>`).join('')}</div>
+  <div class="row"><button class="btn sm" id="extc">Check</button></div><p class="fb" id="extf">${st.done?'Correct: isotope A 20%, isotope B 80%.':''}</p></div>
+  <div class="card">${st.done?`<div class="note ok">The average (10.8) is closer to 11 amu because the heavier isotope is more abundant (80%). Check: (10 × 0.20) + (11 × 0.80) = 2.0 + 8.8 = 10.8.</div>`:'<p class="muted">Solve to see the explanation.</p>'}</div></div></section>`}
+function wire_ext(){const st=S.ext;$$('[data-e]').forEach(i=>i.oninput=()=>{st.v[i.dataset.e]=i.value;save()});
+ $('#extc').onclick=()=>{const want={x:[0.8,.001],pb:[80,.01],pa:[20,.01]};let bad='';Object.entries(want).forEach(([k,[w,t]])=>{const i=$(`[data-e="${k}"]`),ok=close(numv(i.value),w,t);i.classList.toggle('ok',ok);i.classList.toggle('no',!ok);if(ok)st.ok[k]=true;else if(!bad)bad=k});
+  const f=$('#extf');if(!bad){st.done=true;save();show('ext');refresh();return}f.className='fb no';f.textContent=bad==='x'?(close(numv(st.v.x),0.2,.001)?'0.2 is isotope A. x is the abundance of isotope B.':'From 10 + x = 10.8, x = 10.8 − 10.'):bad==='pb'?'Convert x to a percent: multiply by 100.':'The two abundances must add to 100%.';save()}}
+
+/* ===== FINAL ===== */
+const FQ=[
+ {s:'ID',t:'mc',q:'Which pair of atoms are isotopes of the same element?',o:[[iso(12,6,'C','')+' and '+iso(14,6,'C',''),1],[iso(14,6,'C','')+' and '+iso(14,7,'N',''),0],[iso(16,8,'O','')+' and '+iso(17,9,'F',''),0],[iso(40,18,'Ar','')+' and '+iso(40,20,'Ca',''),0]],html:true,exp:'Isotopes have the same atomic number (protons) but different mass numbers. Both carbon atoms have 6 protons.'},
+ {s:'ID',t:'mc',q:'Compared with an atom of chlorine-35, an atom of chlorine-37 has',o:[['the same number of protons and 2 more neutrons',1],['2 more protons and the same number of neutrons',0],['2 more protons and 2 more neutrons',0],['the same number of protons and 2 fewer neutrons',0]],exp:'Both have 17 protons; 37 − 17 = 20 neutrons versus 35 − 17 = 18.'},
+ {s:'PART',t:'num',q:'What is the mass number of an atom that contains 26 protons and 30 neutrons?',ans:56,tol:0,exp:'Mass number = 26 + 30 = 56.'},
+ {s:'PART',t:'num',q:'How many neutrons are in an atom of '+iso(39,19,'K','')+'?',html:true,ans:20,tol:0,exp:'39 − 19 = 20 neutrons.'},
+ {s:'PART',t:'mc',q:'A neutral atom of '+iso(40,20,'Ca','')+' contains',html:true,o:[['20 protons, 20 neutrons, and 20 electrons',1],['20 protons, 40 neutrons, and 20 electrons',0],['40 protons, 20 neutrons, and 40 electrons',0],['20 protons, 20 neutrons, and 40 electrons',0]],exp:'Z = 20 protons and 20 electrons; neutrons = 40 − 20 = 20.'},
+ {s:'AAM',t:'mc',q:'Copper is 69.15% copper-63 and 30.85% copper-65. Which statement is correct?',o:[['Copper-63 has the greater effect on copper’s average atomic mass.',1],['Copper-65 has the greater effect because it is heavier.',0],['Both isotopes have the same effect.',0],['Abundance does not affect average atomic mass.',0]],exp:'The more abundant isotope (copper-63) counts more in the weighted average.'},
+ {s:'AAM',t:'mc',q:'Lithium has two isotopes: lithium-6 (7.5%) and lithium-7 (92.5%). Its average atomic mass is',o:[['between 6 and 7, much closer to 7',1],['exactly 6.5',0],['between 6 and 7, much closer to 6',0],['greater than 7',0]],exp:'The average leans toward the far more abundant lithium-7. The periodic table lists 6.94.'},
+ {s:'AAM',t:'num',q:'Convert a percent abundance of 92.5% to decimal form.',ans:0.925,tol:.0005,exp:'92.5 ÷ 100 = 0.925.'},
+ {s:'AAM',t:'num',q:'An element has two isotopes: 62.93 amu (69.15%) and 64.93 amu (30.85%). Calculate its average atomic mass to two decimal places.',ans:63.55,tol:.02,exp:'(62.93 × 0.6915) + (64.93 × 0.3085) = 43.52 + 20.03 = 63.55 amu.',simple:63.93},
+ {s:'AAM',t:'mc',q:'The periodic table lists the atomic mass of boron as 10.81. This value is',o:[['the weighted average of boron-10 and boron-11, with boron-11 more abundant',1],['the mass number of the most common boron isotope',0],['the simple average of boron-10 and boron-11',0],['the number of protons in boron',0]],exp:'Boron is about 20% boron-10 and 80% boron-11, so the weighted average is 10.81, closer to 11. A simple average would be 10.5.'}];
+const SK={ID:'Isotope identification',PART:'Subatomic particle calculations',AAM:'Average atomic mass calculations'};
+const REVIEW={ID:'Review Module 1: isotopes share protons and differ in neutrons.',PART:'Review Module 2: atomic number, mass number, and neutrons = A − Z.',AAM:'Review Modules 3 and 4: convert percents to decimals and weight each mass.'};
+function gradeQ(q,a){if(a==null||a==='')return false;if(q.t==='mc')return !!q.o[a][1];return close(numv(a),q.ans,q.tol)}
+function V_fin(){const f=S.fin,res=f.res;return `<section>${head('fin','Mastery assessment','10 questions. Answers are checked when you submit. Number answers allow reasonable rounding.','7')}
+ <div class="card" id="finRep" ${res?'':'hidden'}>${res?finReport():''}</div>
+ <div class="stack" id="finList">${FQ.map((q,i)=>{const a=f.ans[i],lock=res&&(!f.retry||res[i]),stc=lock&&res?(res[i]?'ok':'no'):'';
+  return `<div class="fq ${stc}" id="fq${i}"><div class="qh"><span><span class="qn">${i+1}.</span> <b>${q.q}</b></span><span class="badge ${stc}">${stc==='ok'?'Correct':stc==='no'?'Incorrect':SK[q.s]}</span></div>
+  ${q.t==='mc'?`<div>${sshuf(q.o.length,'f'+i).map(j=>`<label class="opt"><input type="radio" name="fq${i}" data-fq="${i}" value="${j}" ${a===j?'checked':''} ${lock?'disabled':''}><span>${q.o[j][0]}</span></label>`).join('')}</div>`:`<label class="fld" style="max-width:220px">Answer<input data-fq="${i}" inputmode="decimal" value="${esc(a==null?'':a)}" ${lock?'disabled':''} aria-label="Answer to question ${i+1}"></label>`}
+  ${stc==='no'&&!f.retry?`<div class="exp"><b>Answer:</b> ${q.t==='mc'?q.o.find(o=>o[1])[0]:q.ans}. ${esc(q.exp)}${q.simple&&close(numv(a),q.simple,.02)?' (You found the simple average; weight by abundance.)':''}</div>`:''}</div>`}).join('')}</div>
+ <div class="row"><button class="btn" id="finSub" ${res&&!f.retry?'disabled':''}>${f.retry?'Submit retry':'Submit assessment'}</button><p class="fb" id="finFb"></p></div></section>`}
+function finReport(){const f=S.fin,res=f.res,c=res.filter(Boolean).length;const sk=Object.keys(SK).map(k=>{const idx=FQ.map((q,i)=>q.s===k?i:-1).filter(i=>i>=0),o=idx.filter(i=>res[i]).length;return[k,o,idx.length]});
+ return `<div class="row" style="justify-content:space-between"><div><p class="eyebrow">Results</p><p class="scoreline">${c} / 10 · ${c*10}%</p></div>${res.some(r=>!r)&&!f.retry?'<button class="btn" id="finRetry">Retry missed questions</button>':''}</div>
+ <div class="tablewrap"><table><thead><tr><th>Skill</th><th>Correct</th><th>Mastery</th></tr></thead><tbody>${sk.map(([k,o,n])=>`<tr><td style="text-align:left">${SK[k]}</td><td>${o} / ${n}</td><td><span class="badge ${o===n?'ok':'no'}">${o===n?'Mastered':'Review'}</span></td></tr>`).join('')}</tbody></table></div>
+ ${sk.some(([,o,n])=>o<n)?`<div class="note"><b>Recommended review:</b><br>${sk.filter(([,o,n])=>o<n).map(([k])=>REVIEW[k]).join('<br>')}</div>`:'<p class="fb ok">All skills mastered.</p>'}
+ <div class="qchips">${res.map((r,i)=>`<button class="${r?'ok':'no'}" data-goto="${i}" aria-label="Question ${i+1}">${i+1}</button>`).join('')}</div>
+ <label class="fld" style="max-width:320px" for="finName">Your name (optional)<input id="finName" value="${esc(f.name||'')}" autocomplete="off"></label>
+ <div class="row"><button class="btn ghost" id="finCopy">Copy results</button>${window.self===window.top?'<button class="btn ghost" id="finPrint">Print results</button>':''}<span class="small" id="finMsg" aria-live="polite"></span></div><textarea id="finText" readonly aria-label="Results summary"></textarea>`}
+function summary(){const f=S.fin,res=f.res||[],c=res.filter(Boolean).length;return `Isotope Lab: student results\nName: ${f.name||'(not entered)'}\nClass mode: ${S.mode} minutes\n\nModules\n${MODS.filter(m=>m[0]!=='fin'&&(m[0]!=='ext'||S.mode===45)).map(([k,t])=>`${t}: ${DONE[k]()?'complete':'not yet'}`).join('\n')}\n\nScore: ${c}/10 (${c*10}%)\n${Object.keys(SK).map(k=>{const idx=FQ.map((q,i)=>q.s===k?i:-1).filter(i=>i>=0);return `• ${SK[k]}: ${idx.filter(i=>res[i]).length}/${idx.length}`}).join('\n')}\nMissed: ${res.map((r,i)=>r?null:i+1).filter(Boolean).join(', ')||'none'}`}
+function wire_fin(){const f=S.fin;$('#finList').addEventListener('input',e=>{const t=e.target;if(t.dataset.fq==null)return;f.ans[+t.dataset.fq]=t.type==='radio'?+t.value:t.value;save()});
+ $('#finList').addEventListener('change',e=>{const t=e.target;if(t.dataset.fq!=null&&t.type==='radio'){f.ans[+t.dataset.fq]=+t.value;save()}});
+ $('#finSub').onclick=()=>{const fb=$('#finFb'),blank=FQ.findIndex((q,i)=>!(f.res&&f.retry&&f.res[i])&&(f.ans[i]==null||f.ans[i]===''));
+  if(blank>=0&&!fb.dataset.w){fb.className='fb no';fb.textContent=`Question ${blank+1} is blank. Press Submit again to turn it in anyway.`;fb.dataset.w='1';return}delete fb.dataset.w;
+  f.res=FQ.map((q,i)=>(f.res&&f.retry&&f.res[i])?true:gradeQ(q,f.ans[i]));f.retry=false;save();show('fin');refresh()};
+ if(f.res){$('#finText').value=summary();const rt=$('#finRetry');if(rt)rt.onclick=()=>{f.retry=true;f.res.forEach((r,i)=>{if(!r)delete f.ans[i]});save();show('fin')};
+  $('#finName').oninput=e=>{f.name=e.target.value;save();$('#finText').value=summary()};
+  $('#finCopy').onclick=()=>{const t=$('#finText');const ok=()=>$('#finMsg').textContent='Copied.',bad=()=>{t.focus();t.select();$('#finMsg').textContent='Press Ctrl+C (⌘C) to copy.'};try{navigator.clipboard.writeText(t.value).then(ok,bad)}catch(e){bad()}};
+  const pb=$('#finPrint');if(pb)pb.onclick=()=>{const w=window.open('','_blank');if(!w){$('#finMsg').textContent='Pop-ups are blocked; use Copy results.';return}w.document.write('<pre style="font:14px monospace;white-space:pre-wrap">'+esc(summary())+'</pre>');w.document.close();w.print()};
+  $('#finRep').addEventListener('click',e=>{const b=e.target.closest('[data-goto]');if(b)$('#fq'+b.dataset.goto).scrollIntoView({block:'center'})})}}
+
+/* ===== nav ===== */
+const MODS=[['m1','Discover isotopes','5'],['m2','Build & compare','7'],['m3','Percent abundance','6'],['m4','Average atomic mass','10'],['m5','Isotope Detective','5'],['fin','Mastery assessment','7'],['ext','Extension','5']];
+const DONE={
+ m1:()=>(short()?[0,1]:[0,1,2,3]).every(i=>mcOk(M1Q[i],S.m1.mc[i]))&&mcOk(M1C,S.m1.qc),
+ m2:()=>!!S.m2.inv&&mcOk(M2Q,S.m2.mc)&&(short()?[DEC[0],DEC[3]]:DEC).every(([A,Z])=>S.m2.dec[A+'-'+Z]&&S.m2.dec[A+'-'+Z].solved),
+ m3:()=>(short()?[80,20]:[50,80,20]).every(x=>S.m3.seen[x])&&M3Q.every((q,i)=>mcOk(q,S.m3.mc[i])),
+ m4:()=>(S.m4.gstep||0)>=3&&(S.m4.clstep||0)>=3,
+ m5:()=>chList().every(k=>S.m5.st[k]&&S.m5.st[k].solved),
+ fin:()=>!!S.fin.res,
+ ext:()=>!!S.ext.done};
+const VIEWS={m1:[V_m1,wire_m1],m2:[V_m2,wire_m2],m3:[V_m3,wire_m3],m4:[V_m4,wire_m4],m5:[V_m5,wire_m5],fin:[V_fin,wire_fin],ext:[V_ext,wire_ext]};
+const visMods=()=>MODS.filter(m=>m[0]!=='ext'||S.mode===45);
+function refresh(){$('#rail').innerHTML=visMods().map(([k,t,min],i)=>`<button data-nav="${k}" aria-current="${S.view===k}" class="${DONE[k]()?'done':''}"><span class="n">${k==='ext'?'Extension':k==='fin'?'Module 6':'Module '+(i+1)} · ${min} min${DONE[k]()?' ✓':''}</span><span class="t">${t}</span></button>`).join('');
+ const vm=visMods(),d=vm.filter(([k])=>DONE[k]()).length;$('#progress').innerHTML=`<span class="lbl">Progress</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${vm.length}" aria-valuenow="${d}" aria-label="Modules complete"><i style="width:${d/vm.length*100}%"></i></div><span class="lbl">${d} of ${vm.length} complete · ${S.mode}-minute plan</span>`}
+function show(k){if(!VIEWS[k]||(k==='ext'&&S.mode!==45))k='m1';S.view=k;save();$('#views').innerHTML=VIEWS[k][0]();VIEWS[k][1]();refresh();if(location.hash.slice(1)!==k){try{history.replaceState(null,'','#'+k)}catch(e){}}}
+document.addEventListener('click',e=>{const n=e.target.closest('[data-nav]');if(n){show(n.dataset.nav);return}
+ const r=e.target.closest('[data-reset]');if(r){if(!r.dataset.armed){r.dataset.armed='1';r.textContent='Click again to reset';setTimeout(()=>{if(r.isConnected){r.textContent='Reset';delete r.dataset.armed}},3500);return}const k=r.dataset.reset;S[k]=DEF()[k];if(k==='m4')calcRows=null;save();show(k);return}
+ const t=e.target.closest('[data-term]');$$('.tip').forEach(x=>x.remove());if(t){const d=document.createElement('div');d.className='tip';d.setAttribute('role','tooltip');d.textContent=TERMS[t.dataset.term];document.body.appendChild(d);const b=t.getBoundingClientRect();d.style.left=Math.max(8,Math.min(innerWidth-296,b.left+scrollX))+'px';d.style.top=(b.bottom+scrollY+6)+'px'}});
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(VIEWS[h]&&h!==S.view)show(h)});
+$('#modeSel').value=String(S.mode);$('#modeSel').onchange=e=>{S.mode=+e.target.value;save();show(S.view)};
+$('#lvlSel').value=String(S.level);$('#lvlSel').onchange=e=>{S.level=+e.target.value;save();show(S.view)};
+const applyMotion=()=>{document.body.classList.toggle('still',S.still);$('#motionBtn').setAttribute('aria-pressed',String(S.still));$('#motionBtn').textContent='Reduce motion: '+(S.still?'on':'off')};
+$('#motionBtn').onclick=()=>{S.still=!S.still;save();applyMotion()};
+const openCalc=o=>{$('#calc').hidden=!o;$('#calcBtn').setAttribute('aria-expanded',String(o));if(o)$('#calcIn').focus()};
+$('#calcBtn').onclick=()=>openCalc($('#calc').hidden);$('#calcClose').onclick=()=>openCalc(false);
+const calcGo=()=>{const x=$('#calcIn').value.replace(/×/g,'*').replace(/÷/g,'/');if(!/^[0-9+\-*/(). ]+$/.test(x)){$('#calcOut').textContent='Use numbers and + − × ÷ ( ) only';return}try{const v=Function('"use strict";return ('+x+')')();$('#calcOut').textContent=Number.isFinite(v)?'= '+(+v.toFixed(6)):'Error'}catch(e){$('#calcOut').textContent='Check the expression'}};
+$('#calcGo').onclick=calcGo;$('#calcIn').onkeydown=e=>{if(e.key==='Enter')calcGo()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$$('.tip').forEach(x=>x.remove());if(!$('#calc').hidden)openCalc(false)}});
+applyMotion();const h0=location.hash.slice(1);show(VIEWS[h0]?h0:S.view);
+})();
+</script>
+
+</body>
+</html>
