@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: a mass-spectrometer bench. Module rail on top; each station pairs a live model or data view (left) with the worksheet (right), stacking on narrow screens. Deliberately single dark theme. */
+/* Layout: a mass-spectrometer bench. Module rail on top; each station pairs a live model or data view (left) with the worksheet (right), stacking on narrow screens. Dark palette on bare :root; light palette via prefers-color-scheme (Auto) or data-theme="light"; header toggle cycles Auto/Light/Dark. */
 :root{
   color-scheme:dark;
   --bg:#0c1220; --bg2:#101a2c; --panel:#141f35; --panel2:#1a2742; --ink:#ebf0f8; --muted:#9ba8be; --line:#2a3a58;
@@ -20,14 +20,38 @@
   --isoA:#b9a3ff; --isoB:#ffc35c;
   --pro:#ff5a5f; --neu:#4f8dff; --ele:#c9d1dd;
   --ok:#4fd18b; --ok-soft:#12321f; --no:#ff7b7b; --no-soft:#3b1b20; --warn-soft:#3a2e12;
+  --bg-glow:#20214a; --stage-hi:#1f2c55; --halo:rgba(255,90,95,.07); --shell:rgba(201,209,221,.32);
+  --particle-edge:#0c1220; --particle-mark:#fff; --ele-mark:#0c1220; --shadow:rgba(0,0,0,.4);
   --display:"Red Hat Display",ui-sans-serif,system-ui,sans-serif;
   --body:"Red Hat Text",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"Red Hat Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --r:12px;
 }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef2f8; --bg2:#f5f7fb; --panel:#ffffff; --panel2:#f1f4fa; --ink:#13203a; --muted:#4d5a72; --line:#c9d2e1;
+    --accent:#5a3ec8; --accent-ink:#ffffff; --glow:rgba(90,62,200,.18);
+    --isoA:#5a3ec8; --isoB:#9a5300;
+    --pro:#d42a3c; --neu:#1d5fd8; --ele:#2b3345;
+    --ok:#12733f; --ok-soft:#dcf2e4; --no:#bd2537; --no-soft:#fbe4e7; --warn-soft:#fbefcf;
+    --bg-glow:#dcd5fb; --stage-hi:#ffffff; --halo:rgba(212,42,60,.08); --shell:rgba(43,51,69,.38);
+    --particle-edge:#ffffff; --particle-mark:#fff; --ele-mark:#ffffff; --shadow:rgba(19,32,58,.18);
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eef2f8; --bg2:#f5f7fb; --panel:#ffffff; --panel2:#f1f4fa; --ink:#13203a; --muted:#4d5a72; --line:#c9d2e1;
+  --accent:#5a3ec8; --accent-ink:#ffffff; --glow:rgba(90,62,200,.18);
+  --isoA:#5a3ec8; --isoB:#9a5300;
+  --pro:#d42a3c; --neu:#1d5fd8; --ele:#2b3345;
+  --ok:#12733f; --ok-soft:#dcf2e4; --no:#bd2537; --no-soft:#fbe4e7; --warn-soft:#fbefcf;
+  --bg-glow:#dcd5fb; --stage-hi:#ffffff; --halo:rgba(212,42,60,.08); --shell:rgba(43,51,69,.38);
+  --particle-edge:#ffffff; --particle-mark:#fff; --ele-mark:#ffffff; --shadow:rgba(19,32,58,.18);
+  color-scheme:light;
+}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:radial-gradient(900px 500px at 80% -10%,#20214a 0%,transparent 60%),var(--bg);background-color:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.55;
+body{background:radial-gradient(900px 500px at 80% -10%,var(--bg-glow) 0%,transparent 60%),var(--bg);background-color:var(--bg);background-repeat:no-repeat;color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
 .wrap{max-width:1160px;margin:0 auto}
 h1,h2,h3{font-family:var(--display);line-height:1.12;text-wrap:balance;margin:0}
@@ -98,9 +122,9 @@ thead th{background:var(--panel2)}
 .dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:5px}
 .dot.p{background:var(--pro)} .dot.n{background:var(--neu)} .dot.e{background:var(--ele)}
 .caption{font-size:.83rem;color:var(--muted)}
-.stage{background:radial-gradient(circle at 50% 46%,#1f2c55,var(--bg2) 72%);border:1px solid var(--line);border-radius:var(--r);display:grid;place-items:center;padding:6px}
+.stage{background:radial-gradient(circle at 50% 46%,var(--stage-hi),var(--bg2) 72%);border:1px solid var(--line);border-radius:var(--r);display:grid;place-items:center;padding:6px}
 svg.atom{width:100%;max-width:360px;height:auto;display:block}
-svg.atom .shell{fill:none;stroke:rgba(201,209,221,.32);stroke-width:1.4;stroke-dasharray:4 5}
+svg.atom .shell{fill:none;stroke:var(--shell);stroke-width:1.4;stroke-dasharray:4 5}
 svg.atom text{font-family:var(--mono),monospace;font-weight:700;text-anchor:middle;dominant-baseline:central;pointer-events:none}
 .isocard{cursor:pointer;text-align:center;border:1px solid var(--line);background:var(--panel2);border-radius:var(--r);padding:10px;display:grid;gap:6px;color:var(--ink)}
 .isocard[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
@@ -146,7 +170,7 @@ fieldset.mc legend{font-weight:700;padding:0 6px}
 .calc td input{max-width:120px;margin:auto}
 .barc{height:14px;border-radius:4px;background:var(--accent)}
 .term{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline dotted;cursor:help;font:inherit}
-.tip{position:absolute;z-index:30;max-width:280px;background:var(--panel2);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:.88rem;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.tip{position:absolute;z-index:30;max-width:280px;background:var(--panel2);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:.88rem;box-shadow:0 10px 30px var(--shadow)}
 .mini{display:grid;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px;max-width:320px}
 .fq{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:14px 16px;display:grid;gap:10px;min-width:0}
 .fq.ok{border-color:var(--ok)} .fq.no{border-color:var(--no)}
@@ -169,6 +193,7 @@ body.still *{animation:none!important;transition:none!important}
     <label class="small muted" for="lvlSel">Level</label><select id="lvlSel"><option value="1">Beginning</option><option value="2">Developing</option><option value="3">Approaching</option><option value="4">Proficient</option></select>
     <button class="btn ghost sm" id="calcBtn" aria-expanded="false">Calculator</button>
     <button class="btn ghost sm" id="motionBtn" aria-pressed="false">Reduce motion: off</button>
+    <button class="btn ghost sm" id="themeBtn" type="button" aria-label="Color theme: Auto (follows system setting). Activate to switch to Light.">Theme: Auto</button>
   </div>
 </div></header>
 <main class="wrap">
@@ -230,9 +255,9 @@ function sshuf(n,seed){let s=[...String(seed)].reduce((a,c)=>(a*31+c.charCodeAt(
 
 /* drawing */
 function nucleus(p,n,R){const N=p+n;if(!N)return'';const pr=Math.min(7,R/Math.sqrt(N)*.95),c=pr*1.1,a=[];let pc=0;for(let i=0;i<N;i++){const w=Math.round((i+1)*p/N);if(w>pc){a.push(1);pc++}else a.push(0)}
-  let s='';for(let i=N-1;i>=0;i--){const r=c*Math.sqrt(i+.5),t=i*2.39996,x=(r*Math.cos(t)).toFixed(1),y=(r*Math.sin(t)).toFixed(1);s+=`<circle cx="${x}" cy="${y}" r="${pr.toFixed(1)}" fill="${a[i]?'var(--pro)':'var(--neu)'}" stroke="#0c1220" stroke-width=".7"/>`;if(pr>=4.5)s+=`<text x="${x}" y="${y}" font-size="${(pr*1.15).toFixed(1)}" fill="#fff">${a[i]?'+':'n'}</text>`}return s}
-function atomSVG(p,n,e,o={}){const sh=shells(e),R0=o.R||30,RAD=[R0+24,R0+50,R0+76,R0+102];let s=`<circle r="${R0+4}" fill="rgba(255,90,95,.07)"/>`;
-  sh.forEach((cnt,si)=>{s+=`<circle class="shell" r="${RAD[si]}"/>`;for(let j=0;j<cnt;j++){const t=-PI/2+j/cnt*2*PI+si*.4,x=(RAD[si]*Math.cos(t)).toFixed(1),y=(RAD[si]*Math.sin(t)).toFixed(1);s+=`<circle cx="${x}" cy="${y}" r="7" fill="var(--ele)" stroke="#0c1220" stroke-width="1.4"/><text x="${x}" y="${y}" font-size="9" fill="#0c1220">−</text>`}});
+  let s='';for(let i=N-1;i>=0;i--){const r=c*Math.sqrt(i+.5),t=i*2.39996,x=(r*Math.cos(t)).toFixed(1),y=(r*Math.sin(t)).toFixed(1);s+=`<circle cx="${x}" cy="${y}" r="${pr.toFixed(1)}" fill="${a[i]?'var(--pro)':'var(--neu)'}" stroke="var(--particle-edge)" stroke-width=".7"/>`;if(pr>=4.5)s+=`<text x="${x}" y="${y}" font-size="${(pr*1.15).toFixed(1)}" fill="var(--particle-mark)">${a[i]?'+':'n'}</text>`}return s}
+function atomSVG(p,n,e,o={}){const sh=shells(e),R0=o.R||30,RAD=[R0+24,R0+50,R0+76,R0+102];let s=`<circle r="${R0+4}" fill="var(--halo)"/>`;
+  sh.forEach((cnt,si)=>{s+=`<circle class="shell" r="${RAD[si]}"/>`;for(let j=0;j<cnt;j++){const t=-PI/2+j/cnt*2*PI+si*.4,x=(RAD[si]*Math.cos(t)).toFixed(1),y=(RAD[si]*Math.sin(t)).toFixed(1);s+=`<circle cx="${x}" cy="${y}" r="7" fill="var(--ele)" stroke="var(--particle-edge)" stroke-width="1.4"/><text x="${x}" y="${y}" font-size="9" fill="var(--ele-mark)">−</text>`}});
   s+=nucleus(p,n,R0);const vb=(sh.length?RAD[sh.length-1]:R0)+16;
   return `<svg class="atom" viewBox="${-vb} ${-vb} ${2*vb} ${2*vb}" role="img" aria-label="${esc(o.label||`${p} protons (red, +), ${n} neutrons (blue, n), ${e} electrons (grey, −)`)}">${s}</svg>`}
 const iso=(A,Z,s,cls='lg')=>`<span class="iso ${cls}" aria-label="${s}-${A}: mass number ${A}, atomic number ${Z}"><span class="iso-n"><span>${A}</span><span>${Z}</span></span><span class="iso-s">${s}</span></span>`;
@@ -476,6 +501,15 @@ $('#calcBtn').onclick=()=>openCalc($('#calc').hidden);$('#calcClose').onclick=()
 const calcGo=()=>{const x=$('#calcIn').value.replace(/×/g,'*').replace(/÷/g,'/');if(!/^[0-9+\-*/(). ]+$/.test(x)){$('#calcOut').textContent='Use numbers and + − × ÷ ( ) only';return}try{const v=Function('"use strict";return ('+x+')')();$('#calcOut').textContent=Number.isFinite(v)?'= '+(+v.toFixed(6)):'Error'}catch(e){$('#calcOut').textContent='Check the expression'}};
 $('#calcGo').onclick=calcGo;$('#calcIn').onkeydown=e=>{if(e.key==='Enter')calcGo()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$$('.tip').forEach(x=>x.remove());if(!$('#calc').hidden)openCalc(false)}});
+/* theme: Auto (host/system) → Light → Dark */
+const hostTheme=document.documentElement.getAttribute('data-theme');
+const THEMES=['auto','light','dark'],TNAME={auto:'Auto',light:'Light',dark:'Dark'};
+let themePref='auto';try{const t=localStorage.getItem('theme-pref');if(THEMES.includes(t))themePref=t}catch(e){}
+const applyTheme=()=>{const r=document.documentElement;if(themePref==='auto'){if(hostTheme!==null)r.setAttribute('data-theme',hostTheme);else r.removeAttribute('data-theme')}else r.setAttribute('data-theme',themePref);
+  const nx=THEMES[(THEMES.indexOf(themePref)+1)%3],b=$('#themeBtn');b.textContent='Theme: '+TNAME[themePref];
+  b.setAttribute('aria-label','Color theme: '+TNAME[themePref]+(themePref==='auto'?' (follows system setting)':'')+'. Activate to switch to '+TNAME[nx]+'.')};
+$('#themeBtn').onclick=()=>{themePref=THEMES[(THEMES.indexOf(themePref)+1)%3];try{localStorage.setItem('theme-pref',themePref)}catch(e){}applyTheme();show(S.view)};
+applyTheme();
 applyMotion();const h0=location.hash.slice(1);show(VIEWS[h0]?h0:S.view);
 })();
 </script>
